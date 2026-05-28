@@ -4,8 +4,8 @@ English | [简体中文](#简体中文)
 
 Show elegant, customizable captions under images in both **Live Preview** (Editing) and **Reading Mode** in Obsidian. Fully supports standard Markdown images, Wiki embeds, and external image hosts.
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/BCS/wk-image-caption?style=flat-square&color=66a3ff)
-![License](https://img.shields.io/github/license/BCS/wk-image-caption?style=flat-square&color=mediumpurple)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/BCS1037/wk-image-caption?style=flat-square&color=66a3ff)
+![License](https://img.shields.io/github/license/BCS1037/wk-image-caption?style=flat-square&color=mediumpurple)
 ![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=purple&label=downloads&query=%24%5B%27wk-image-caption%27%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json&style=flat-square)
 
 ---
@@ -29,7 +29,7 @@ Show elegant, customizable captions under images in both **Live Preview** (Editi
 
 | Standard Markdown Image (Live Preview) | Wiki Embed Image (Reading Mode) |
 |---|---|
-| ![Markdown Image Example](https://raw.githubusercontent.com/BCS/wk-image-caption/main/assets/markdown-preview.png) | ![Wiki Embed Example](https://raw.githubusercontent.com/BCS/wk-image-caption/main/assets/wiki-preview.png) |
+| ![Markdown Image Example](https://raw.githubusercontent.com/BCS1037/wk-image-caption/main/assets/markdown-preview.png) | ![Wiki Embed Example](https://raw.githubusercontent.com/BCS1037/wk-image-caption/main/assets/wiki-preview.png) |
 
 ---
 
@@ -41,7 +41,7 @@ Show elegant, customizable captions under images in both **Live Preview** (Editi
 3. Click **Install**, then **Enable** the plugin.
 
 ### Option 2: Manual Installation
-1. Go to the [Releases](https://github.com/BCS/wk-image-caption/releases) page and download `main.js`, `manifest.json`, and `styles.css`.
+1. Go to the [Releases](https://github.com/BCS1037/wk-image-caption/releases) page and download `main.js`, `manifest.json`, and `styles.css`.
 2. Locate your Obsidian Vault's plugins folder: `<vault>/.obsidian/plugins/`.
 3. Create a folder named `wk-image-caption` and paste the downloaded files inside.
 4. Open Obsidian **Settings** > **Community plugins** and toggle **wk image caption** on.
@@ -122,7 +122,7 @@ This plugin is licensed under the [MIT License](LICENSE).
 3. 点击 **安装**，随后选择 **启用**。
 
 #### 方法二：手动安装
-1. 前往 [Releases](https://github.com/BCS/wk-image-caption/releases) 下载 `main.js`、`manifest.json` 和 `styles.css`。
+1. 前往 [Releases](https://github.com/BCS1037/wk-image-caption/releases) 下载 `main.js`、`manifest.json` 和 `styles.css`。
 2. 进入您 Vault 的插件目录 `<vault>/.obsidian/plugins/`。
 3. 新建名为 `wk-image-caption` 的文件夹，将这三个文件放进去。
 4. 打开 Obsidian 的 **社区插件** 选项卡，启用该插件。
