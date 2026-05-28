@@ -86,6 +86,9 @@ export default class ImageCaptionPlugin extends Plugin {
 		}
 
 		if (existingCaption) {
+			if (embedParent) {
+				embedParent.classList.add('has-caption');
+			}
 			return;
 		}
 
@@ -118,11 +121,21 @@ export default class ImageCaptionPlugin extends Plugin {
 			} else {
 				img.after(captionEl);
 			}
+
+			if (embedParent) {
+				embedParent.classList.add('has-caption');
+			}
+		} else {
+			if (embedParent) {
+				embedParent.classList.remove('has-caption');
+			}
 		}
 	}
 
 	onunload() {
-		// 所有的后处理器及编辑器扩展会被 Obsidian 引擎生命周期自动完全清理回收，确保零残留
+		// 彻底清除页面上残留的所有 caption 节点及 has-caption 样式类
+		activeDocument.querySelectorAll('.image-caption').forEach((el) => el.remove());
+		activeDocument.querySelectorAll('.has-caption').forEach((el) => el.classList.remove('has-caption'));
 	}
 
 	async loadSettings() {

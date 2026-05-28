@@ -107,6 +107,9 @@ var ImageCaptionLPPlugin = class {
       }
       if (existingCaption) {
         this.applyStyleClasses(existingCaption, settings);
+        if (embedParent) {
+          embedParent.classList.add("has-caption");
+        }
         return;
       }
       const altText = img.getAttribute("alt");
@@ -127,6 +130,13 @@ var ImageCaptionLPPlugin = class {
           }
         } else {
           img.after(captionEl);
+        }
+        if (embedParent) {
+          embedParent.classList.add("has-caption");
+        }
+      } else {
+        if (embedParent) {
+          embedParent.classList.remove("has-caption");
         }
       }
     });
@@ -196,6 +206,9 @@ var ImageCaptionPlugin = class extends import_obsidian.Plugin {
       }
     }
     if (existingCaption) {
+      if (embedParent) {
+        embedParent.classList.add("has-caption");
+      }
       return;
     }
     const altText = img.getAttribute("alt");
@@ -218,9 +231,18 @@ var ImageCaptionPlugin = class extends import_obsidian.Plugin {
       } else {
         img.after(captionEl);
       }
+      if (embedParent) {
+        embedParent.classList.add("has-caption");
+      }
+    } else {
+      if (embedParent) {
+        embedParent.classList.remove("has-caption");
+      }
     }
   }
   onunload() {
+    activeDocument.querySelectorAll(".image-caption").forEach((el) => el.remove());
+    activeDocument.querySelectorAll(".has-caption").forEach((el) => el.classList.remove("has-caption"));
   }
   async loadSettings() {
     const data = await this.loadData();

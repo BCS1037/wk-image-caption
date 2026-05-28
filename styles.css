@@ -42,16 +42,16 @@
 
 /*
  * 核心修复：.image-embed 在 Live Preview 中默认为 flex-direction: row，
- * 当容器内含有 .image-caption 时，强制切换为 column 布局，
+ * 当容器被标记为 .has-caption 时，强制切换为 column 布局，
  * 使 caption 垂直排列在图片正下方而非被挤到右侧。
  */
-.image-embed:has(> .image-caption) {
+.image-embed.has-caption {
 	flex-direction: column;
 	align-items: center;
 }
 
 /* 确保 .image-wrapper（缩放容器）在 column 布局下占满宽度 */
-.image-embed:has(> .image-caption) > .image-wrapper {
+.image-embed.has-caption > .image-wrapper {
 	width: 100%;
 }
 

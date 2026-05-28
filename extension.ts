@@ -137,6 +137,9 @@ class ImageCaptionLPPlugin implements PluginValue {
 			if (existingCaption) {
 				// 已经存在，更新样式类（响应设置实时改变）
 				this.applyStyleClasses(existingCaption, settings);
+				if (embedParent) {
+					embedParent.classList.add('has-caption');
+				}
 				return;
 			}
 
@@ -165,6 +168,14 @@ class ImageCaptionLPPlugin implements PluginValue {
 					}
 				} else {
 					img.after(captionEl);
+				}
+
+				if (embedParent) {
+					embedParent.classList.add('has-caption');
+				}
+			} else {
+				if (embedParent) {
+					embedParent.classList.remove('has-caption');
 				}
 			}
 		});
