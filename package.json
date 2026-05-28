@@ -1,0 +1,19 @@
+{
+	"name": "wk-image-caption",
+	"version": "0.2.0",
+	"description": "Show elegant captions under images in both Live Preview and Reading Mode.",
+	"main": "main.js",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "node esbuild.config.mjs production"
+	},
+	"keywords": [],
+	"author": "BCS",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/node": "^16.11.6",
+		"esbuild": "0.17.3",
+		"obsidian": "latest",
+		"typescript": "4.7.4"
+	}
+}

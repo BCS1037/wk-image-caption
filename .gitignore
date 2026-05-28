@@ -1,0 +1,12 @@
+# Dependency directories
+node_modules/
+
+# Build outputs
+dist/
+
+# OS metadata
+.DS_Store
+
+# Internal docs & Filetree Index (Agent Isolation Security)
+PRD/
+FILETREE.md
