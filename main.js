@@ -27,10 +27,15 @@ var import_obsidian = require("obsidian");
 // extension.ts
 var import_view = require("@codemirror/view");
 function parseCaption(altText, showFileName, srcText) {
+  const getCleanFileName = (src) => {
+    if (!src)
+      return null;
+    const fileName = src.split("/").pop() || src;
+    return decodeURIComponent(fileName.split("?")[0]);
+  };
   if (!altText || altText.trim() === "") {
     if (showFileName && srcText) {
-      const fileName = srcText.split("/").pop() || srcText;
-      return decodeURIComponent(fileName);
+      return getCleanFileName(srcText);
     }
     return null;
   }
@@ -45,10 +50,19 @@ function parseCaption(altText, showFileName, srcText) {
   const caption = parts.join("|").trim();
   if (caption === "") {
     if (showFileName && srcText) {
-      const fileName = srcText.split("/").pop() || srcText;
-      return decodeURIComponent(fileName);
+      return getCleanFileName(srcText);
     }
     return null;
+  }
+  if (!showFileName) {
+    const cleanSrcName = getCleanFileName(srcText);
+    if (cleanSrcName && cleanSrcName === caption) {
+      return null;
+    }
+    const lowerCaption = caption.toLowerCase();
+    if (lowerCaption.endsWith(".png") || lowerCaption.endsWith(".jpg") || lowerCaption.endsWith(".jpeg") || lowerCaption.endsWith(".gif") || lowerCaption.endsWith(".webp") || lowerCaption.endsWith(".svg") || lowerCaption.endsWith(".bmp")) {
+      return null;
+    }
   }
   return caption;
 }
@@ -89,6 +103,10 @@ var ImageCaptionLPPlugin = class {
     imgs.forEach((img) => {
       const wrapper = img.closest(".image-wrapper");
       const embedParent = img.closest(".image-embed") || img.closest(".cm-embed-block");
+      const altText = img.getAttribute("alt");
+      const resolvedAlt = altText || (embedParent ? embedParent.getAttribute("alt") : null);
+      const resolvedSrc = img.getAttribute("src") || (embedParent ? embedParent.getAttribute("src") : null);
+      const captionText = parseCaption(resolvedAlt, settings.showFileNameAsCaption, resolvedSrc);
       let existingCaption = null;
       if (embedParent) {
         existingCaption = embedParent.querySelector(":scope > .image-caption");
@@ -106,16 +124,24 @@ var ImageCaptionLPPlugin = class {
         }
       }
       if (existingCaption) {
-        this.applyStyleClasses(existingCaption, settings);
-        if (embedParent) {
-          embedParent.classList.add("has-caption");
+        if (captionText) {
+          if (existingCaption.textContent !== captionText) {
+            existingCaption.setText(captionText);
+          }
+          this.applyStyleClasses(existingCaption, settings);
+          if (embedParent) {
+            embedParent.classList.add("has-caption");
+          }
+          img.dataset.hasCaption = "true";
+        } else {
+          existingCaption.remove();
+          delete img.dataset.hasCaption;
+          if (embedParent) {
+            embedParent.classList.remove("has-caption");
+          }
         }
         return;
       }
-      const altText = img.getAttribute("alt");
-      const resolvedAlt = altText || (embedParent ? embedParent.getAttribute("alt") : null);
-      const resolvedSrc = img.getAttribute("src") || (embedParent ? embedParent.getAttribute("src") : null);
-      const captionText = parseCaption(resolvedAlt, settings.showFileNameAsCaption, resolvedSrc);
       if (captionText) {
         img.dataset.hasCaption = "true";
         const captionEl = activeDocument.createElement("div");
@@ -191,6 +217,10 @@ var ImageCaptionPlugin = class extends import_obsidian.Plugin {
    */
   injectReadingCaption(img, embedParent) {
     const wrapper = img.closest(".image-wrapper");
+    const altText = img.getAttribute("alt");
+    const resolvedAlt = altText || (embedParent ? embedParent.getAttribute("alt") : null);
+    const resolvedSrc = img.getAttribute("src") || (embedParent ? embedParent.getAttribute("src") : null);
+    const captionText = parseCaption(resolvedAlt, this.settings.showFileNameAsCaption, resolvedSrc);
     let existingCaption = null;
     if (wrapper) {
       const next = wrapper.nextElementSibling;
@@ -206,15 +236,26 @@ var ImageCaptionPlugin = class extends import_obsidian.Plugin {
       }
     }
     if (existingCaption) {
-      if (embedParent) {
-        embedParent.classList.add("has-caption");
+      if (captionText) {
+        if (existingCaption.textContent !== captionText) {
+          existingCaption.setText(captionText);
+        }
+        existingCaption.className = "image-caption";
+        existingCaption.classList.add(`align-${this.settings.captionAlign}`);
+        existingCaption.classList.add(`style-${this.settings.captionStyle}`);
+        if (embedParent) {
+          embedParent.classList.add("has-caption");
+        }
+        img.dataset.hasCaption = "true";
+      } else {
+        existingCaption.remove();
+        delete img.dataset.hasCaption;
+        if (embedParent) {
+          embedParent.classList.remove("has-caption");
+        }
       }
       return;
     }
-    const altText = img.getAttribute("alt");
-    const resolvedAlt = altText || (embedParent ? embedParent.getAttribute("alt") : null);
-    const resolvedSrc = img.getAttribute("src") || (embedParent ? embedParent.getAttribute("src") : null);
-    const captionText = parseCaption(resolvedAlt, this.settings.showFileNameAsCaption, resolvedSrc);
     if (captionText) {
       img.dataset.hasCaption = "true";
       const captionEl = activeDocument.createElement("div");

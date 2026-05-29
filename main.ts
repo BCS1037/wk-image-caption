@@ -69,7 +69,14 @@ export default class ImageCaptionPlugin extends Plugin {
 	injectReadingCaption(img: HTMLImageElement, embedParent: HTMLElement | null) {
 		const wrapper = img.closest('.image-wrapper') as HTMLElement | null;
 
-		// 1. 精准检查 DOM 树中是否真正存在属于该图片的 caption 元素，保证幂等性
+		// 1. 解析当前的 alt 和 src 元数据并计算最新的说明文字
+		const altText = img.getAttribute('alt');
+		const resolvedAlt = altText || (embedParent ? embedParent.getAttribute('alt') : null);
+		const resolvedSrc = img.getAttribute('src') || (embedParent ? embedParent.getAttribute('src') : null);
+
+		const captionText = parseCaption(resolvedAlt, this.settings.showFileNameAsCaption, resolvedSrc);
+
+		// 2. 精准检查 DOM 树中是否真正存在属于该图片的 caption 元素
 		let existingCaption: HTMLElement | null = null;
 		if (wrapper) {
 			const next = wrapper.nextElementSibling;
@@ -85,20 +92,33 @@ export default class ImageCaptionPlugin extends Plugin {
 			}
 		}
 
+		// 3. 反应式数据流处理
 		if (existingCaption) {
-			if (embedParent) {
-				embedParent.classList.add('has-caption');
+			if (captionText) {
+				// 文本变化时，实时更新文本内容
+				if (existingCaption.textContent !== captionText) {
+					existingCaption.setText(captionText);
+				}
+				// 响应式更新样式类
+				existingCaption.className = 'image-caption';
+				existingCaption.classList.add(`align-${this.settings.captionAlign}`);
+				existingCaption.classList.add(`style-${this.settings.captionStyle}`);
+				if (embedParent) {
+					embedParent.classList.add('has-caption');
+				}
+				img.dataset.hasCaption = 'true';
+			} else {
+				// 说明文字被删除，清理节点与相应标记
+				existingCaption.remove();
+				delete img.dataset.hasCaption;
+				if (embedParent) {
+					embedParent.classList.remove('has-caption');
+				}
 			}
 			return;
 		}
 
-		// 2. 获取并处理元数据
-		const altText = img.getAttribute('alt');
-		const resolvedAlt = altText || (embedParent ? embedParent.getAttribute('alt') : null);
-		const resolvedSrc = img.getAttribute('src') || (embedParent ? embedParent.getAttribute('src') : null);
-
-		const captionText = parseCaption(resolvedAlt, this.settings.showFileNameAsCaption, resolvedSrc);
-
+		// 4. 创建并注入全新 Caption 元素
 		if (captionText) {
 			img.dataset.hasCaption = 'true';
 

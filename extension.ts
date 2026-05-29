@@ -27,10 +27,16 @@ export function parseCaption(
 	showFileName: boolean,
 	srcText: string | null
 ): string | null {
+	// 提取清洁文件名（去除 query 参数，如 ?1780017705323）
+	const getCleanFileName = (src: string | null): string | null => {
+		if (!src) return null;
+		const fileName = src.split('/').pop() || src;
+		return decodeURIComponent(fileName.split('?')[0]);
+	};
+
 	if (!altText || altText.trim() === '') {
 		if (showFileName && srcText) {
-			const fileName = srcText.split('/').pop() || srcText;
-			return decodeURIComponent(fileName);
+			return getCleanFileName(srcText);
 		}
 		return null;
 	}
@@ -49,10 +55,31 @@ export function parseCaption(
 
 	if (caption === '') {
 		if (showFileName && srcText) {
-			const fileName = srcText.split('/').pop() || srcText;
-			return decodeURIComponent(fileName);
+			return getCleanFileName(srcText);
 		}
 		return null;
+	}
+
+	// 如果关闭了“文件名兜底”开关，且解析出来的说明文字刚好是图片的文件名，则过滤掉它
+	if (!showFileName) {
+		const cleanSrcName = getCleanFileName(srcText);
+		if (cleanSrcName && cleanSrcName === caption) {
+			return null;
+		}
+
+		// 过滤常见的图片扩展名，避免将默认的 alt 文件名误展示为说明
+		const lowerCaption = caption.toLowerCase();
+		if (
+			lowerCaption.endsWith('.png') ||
+			lowerCaption.endsWith('.jpg') ||
+			lowerCaption.endsWith('.jpeg') ||
+			lowerCaption.endsWith('.gif') ||
+			lowerCaption.endsWith('.webp') ||
+			lowerCaption.endsWith('.svg') ||
+			lowerCaption.endsWith('.bmp')
+		) {
+			return null;
+		}
 	}
 
 	return caption;
@@ -115,7 +142,14 @@ class ImageCaptionLPPlugin implements PluginValue {
 			const wrapper = img.closest('.image-wrapper') as HTMLElement | null;
 			const embedParent = img.closest('.image-embed') || img.closest('.cm-embed-block') as HTMLElement | null;
 
-			// 检查 DOM 树中是否真正存在属于该图片的 caption 元素，保证幂等性
+			// 1. 解析当前的 alt 和 src 元数据并计算最新的说明文字
+			const altText = img.getAttribute('alt');
+			const resolvedAlt = altText || (embedParent ? embedParent.getAttribute('alt') : null);
+			const resolvedSrc = img.getAttribute('src') || (embedParent ? embedParent.getAttribute('src') : null);
+
+			const captionText = parseCaption(resolvedAlt, settings.showFileNameAsCaption, resolvedSrc);
+
+			// 2. 检查 DOM 树中是否真正存在属于该图片的 caption 元素
 			// 优先使用 embedParent 级别检查，覆盖 wrapper + embedParent 同时存在的场景
 			let existingCaption: HTMLElement | null = null;
 			if (embedParent) {
@@ -134,22 +168,31 @@ class ImageCaptionLPPlugin implements PluginValue {
 				}
 			}
 
+			// 3. 反应式数据流处理
 			if (existingCaption) {
-				// 已经存在，更新样式类（响应设置实时改变）
-				this.applyStyleClasses(existingCaption, settings);
-				if (embedParent) {
-					embedParent.classList.add('has-caption');
+				if (captionText) {
+					// 文本变化时，实时更新文本内容
+					if (existingCaption.textContent !== captionText) {
+						existingCaption.setText(captionText);
+					}
+					// 响应式更新样式类
+					this.applyStyleClasses(existingCaption, settings);
+					if (embedParent) {
+						embedParent.classList.add('has-caption');
+					}
+					img.dataset.hasCaption = 'true';
+				} else {
+					// 说明文字被删除，清理节点与相应标记
+					existingCaption.remove();
+					delete img.dataset.hasCaption;
+					if (embedParent) {
+						embedParent.classList.remove('has-caption');
+					}
 				}
 				return;
 			}
 
-			// 解析 alt 和 src 元数据
-			const altText = img.getAttribute('alt');
-			const resolvedAlt = altText || (embedParent ? embedParent.getAttribute('alt') : null);
-			const resolvedSrc = img.getAttribute('src') || (embedParent ? embedParent.getAttribute('src') : null);
-
-			const captionText = parseCaption(resolvedAlt, settings.showFileNameAsCaption, resolvedSrc);
-
+			// 4. 创建并注入全新 Caption 元素
 			if (captionText) {
 				img.dataset.hasCaption = 'true';
 
