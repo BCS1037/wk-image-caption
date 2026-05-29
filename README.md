@@ -4,6 +4,8 @@ English | [简体中文](#简体中文)
 
 Show elegant, customizable captions under images in both **Live Preview** (Editing) and **Reading Mode** in Obsidian. Fully supports standard Markdown images, Wiki embeds, and external image hosts.
 
+![wk image caption Showcase](images/image.png)
+
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/BCS1037/wk-image-caption?style=flat-square&color=66a3ff)
 ![License](https://img.shields.io/github/license/BCS1037/wk-image-caption?style=flat-square&color=mediumpurple)
 ![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=purple&label=downloads&query=%24%5B%27wk-image-caption%27%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json&style=flat-square)
@@ -22,14 +24,6 @@ Show elegant, customizable captions under images in both **Live Preview** (Editi
   - Customize text alignment (Left, Center, Right).
   - Customize text styling (Italic or Normal).
   - Instant UI updates without reloading the plugin.
-
----
-
-## 📸 Screenshots
-
-| Standard Markdown Image (Live Preview) | Wiki Embed Image (Reading Mode) |
-|---|---|
-| ![Markdown Image Example](https://raw.githubusercontent.com/BCS1037/wk-image-caption/main/assets/markdown-preview.png) | ![Wiki Embed Example](https://raw.githubusercontent.com/BCS1037/wk-image-caption/main/assets/wiki-preview.png) |
 
 ---
 
